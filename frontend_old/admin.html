@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Smart Queue</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="text-slate-300">
+
+    <div class="admin-layout flex h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between md:flex">
+            <div class="p-6">
+                <div class="flex items-center gap-2 text-white mb-10">
+                    <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <span class="font-bold tracking-wider text-lg">ADMIN</span>
+                </div>
+                <ul class="space-y-2 text-sm font-medium w-full">
+                    <li><button id="nav-overview" onclick="switchTab('overview')" class="nav-btn block w-full text-left px-4 py-3 bg-indigo-600 text-white rounded-lg">Overview</button></li>
+                    <li><button id="nav-locations" onclick="switchTab('locations')" class="nav-btn block w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">Manage Locations</button></li>
+                    <li><button id="nav-staff" onclick="switchTab('staff')" class="nav-btn block w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">Manage Staff</button></li>
+                    <li><button id="nav-reports" onclick="switchTab('reports')" class="nav-btn block w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">System Reports</button></li>
+                </ul>
+            </div>
+            <div class="p-6">
+                <button onclick="logout()" class="text-sm font-medium text-slate-500 hover:text-red-400 transition w-full text-left">Log Out</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            
+            <!-- TABS CONTAINER -->
+            
+            <!-- TAB: OVERVIEW -->
+            <div id="tab-overview" class="tab-pane block">
+                <header class="admin-header mb-10">
+                    <div>
+                    <h1 class="text-3xl font-bold text-white">Platform Overview</h1>
+                    <p class="text-sm text-slate-400 mt-1">Welcome back, <span id="adminName">Admin</span></p>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="openModal('counterModal')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm shadow-lg shadow-indigo-600/20 transition">Create Counter</button>
+                </div>
+            </header>
+
+                <div class="admin-metric-grid gap-6 mb-10">
+                    <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700 p-6 rounded-2xl">
+                        <p class="text-slate-400 text-sm font-medium mb-2">Total Locations</p>
+                        <h2 class="text-3xl font-bold text-white" data-metric="locations">--</h2>
+                    </div>
+                    <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700 p-6 rounded-2xl">
+                        <p class="text-slate-400 text-sm font-medium mb-2">Active Counters</p>
+                        <h2 class="text-3xl font-bold text-indigo-400" data-metric="counters">--</h2>
+                    </div>
+                    <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700 p-6 rounded-2xl">
+                        <p class="text-slate-400 text-sm font-medium mb-2">Total Tokens Today</p>
+                        <h2 class="text-3xl font-bold text-green-400" data-metric="tokens">--</h2>
+                    </div>
+                    <div class="bg-slate-800/50 backdrop-blur-md border border-slate-700 p-6 rounded-2xl">
+                        <p class="text-slate-400 text-sm font-medium mb-2">Avg Wait Time</p>
+                        <h2 class="text-3xl font-bold text-yellow-400" data-metric="waittime">--</h2>
+                    </div>
+                </div>
+
+                <!-- Database Abstract Table -->
+                <div class="table-responsive bg-slate-800/50 backdrop-blur-md border border-slate-700 rounded-2xl overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+                        <h3 class="font-semibold text-white">Active Counters Performance</h3>
+                    </div>
+                    <table class="w-full text-sm text-left text-slate-400">
+                        <thead class="text-xs uppercase bg-slate-800/80 text-slate-300">
+                            <tr>
+                                <th class="px-6 py-4">Location</th>
+                                <th class="px-6 py-4">Counter Name</th>
+                                <th class="px-6 py-4">Assigned Staff</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                                <td class="px-6 py-4 font-medium text-white">City Hospital</td>
+                                <td class="px-6 py-4">OPD Desk 1</td>
+                                <td class="px-6 py-4">John Staff</td>
+                                <td class="px-6 py-4"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs">Serving</span></td>
+                                <td class="px-6 py-4"><a href="#" class="text-indigo-400 hover:underline">Manage</a></td>
+                            </tr>
+                            <tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                                <td class="px-6 py-4 font-medium text-white">State Bank Branch A</td>
+                                <td class="px-6 py-4">Teller 2</td>
+                                <td class="px-6 py-4">Unassigned</td>
+                                <td class="px-6 py-4"><span class="bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded text-xs">Offline</span></td>
+                                <td class="px-6 py-4"><a href="#" class="text-indigo-400 hover:underline">Assign</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: MANAGE LOCATIONS -->
+            <div id="tab-locations" class="tab-pane hidden">
+                <header class="flex justify-between items-center mb-10">
+                    <h1 class="text-3xl font-bold text-white">Manage Locations</h1>
+                    <button onclick="openModal('locationModal')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm shadow-lg transition">+ New Location</button>
+                </header>
+                <div class="table-responsive bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
+                    <table class="w-full text-sm text-left text-slate-400">
+                        <thead class="text-xs uppercase bg-slate-800/80 text-slate-300">
+                            <tr>
+                                <th class="px-6 py-4">ID</th>
+                                <th class="px-6 py-4">Sector</th>
+                                <th class="px-6 py-4">Location Name</th>
+                                <th class="px-6 py-4">Active Counters</th>
+                                <th class="px-6 py-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-700/50">
+                                <td class="px-6 py-4">#LOC-101</td>
+                                <td class="px-6 py-4 uppercase text-xs tracking-wider">Hospital</td>
+                                <td class="px-6 py-4 font-medium text-white">City Hospital Main</td>
+                                <td class="px-6 py-4">8</td>
+                                <td class="px-6 py-4"><a href="#" class="text-indigo-400 hover:underline mr-3">Edit</a><a href="#" class="text-red-400 hover:underline">Delete</a></td>
+                            </tr>
+                            <tr class="border-b border-slate-700/50">
+                                <td class="px-6 py-4">#LOC-102</td>
+                                <td class="px-6 py-4 uppercase text-xs tracking-wider">Bank</td>
+                                <td class="px-6 py-4 font-medium text-white">State Bank Branch A</td>
+                                <td class="px-6 py-4">4</td>
+                                <td class="px-6 py-4"><a href="#" class="text-indigo-400 hover:underline mr-3">Edit</a><a href="#" class="text-red-400 hover:underline">Delete</a></td>
+                            </tr>
+                            <tr class="border-b border-slate-700/50">
+                                <td class="px-6 py-4">#LOC-103</td>
+                                <td class="px-6 py-4 uppercase text-xs tracking-wider">College</td>
+                                <td class="px-6 py-4 font-medium text-white">Engineering College Campus</td>
+                                <td class="px-6 py-4">2</td>
+                                <td class="px-6 py-4"><a href="#" class="text-indigo-400 hover:underline mr-3">Edit</a><a href="#" class="text-red-400 hover:underline">Delete</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: MANAGE STAFF -->
+            <div id="tab-staff" class="tab-pane hidden">
+                <header class="flex justify-between items-center mb-10">
+                    <h1 class="text-3xl font-bold text-white">Manage Staff</h1>
+                    <button onclick="openModal('staffModal')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm shadow-lg transition">+ Onboard Staff</button>
+                </header>
+                <div class="table-responsive bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
+                    <table class="w-full text-sm text-left text-slate-400">
+                        <thead class="text-xs uppercase bg-slate-800/80 text-slate-300">
+                            <tr>
+                                <th class="px-6 py-4">Name</th>
+                                <th class="px-6 py-4">Email</th>
+                                <th class="px-6 py-4">Assigned Counter</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-700/50">
+                                <td class="px-6 py-4 font-medium text-white">John Staff</td>
+                                <td class="px-6 py-4">staff@queue.com</td>
+                                <td class="px-6 py-4">OPD Desk 1 (City Hospital)</td>
+                                <td class="px-6 py-4"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs">Active</span></td>
+                                <td class="px-6 py-4"><a href="#" class="text-indigo-400 hover:underline">Revoke Access</a></td>
+                            </tr>
+                            <tr class="border-b border-slate-700/50">
+                                <td class="px-6 py-4 font-medium text-white">Sarah Manager</td>
+                                <td class="px-6 py-4">sarah@queue.com</td>
+                                <td class="px-6 py-4 text-slate-500">Unassigned</td>
+                                <td class="px-6 py-4"><span class="bg-slate-500/10 text-slate-400 px-2 py-1 rounded text-xs">On Leave</span></td>
+                                <td class="px-6 py-4"><a href="#" class="text-indigo-400 hover:underline">Assign</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB: SYSTEM REPORTS -->
+            <div id="tab-reports" class="tab-pane hidden">
+                <header class="flex justify-between items-center mb-10">
+                    <h1 class="text-3xl font-bold text-white">System Reports & Analytics</h1>
+                    <button onclick="downloadCSV()" class="bg-slate-700 border border-slate-600 hover:border-slate-400 px-4 py-2 rounded-lg text-sm text-white transition">Export CSV</button>
+                </header>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <!-- Real Chart.js Graphs -->
+                    <div class="bg-slate-800/50 border border-slate-700 p-4 rounded-2xl h-80 w-full">
+                        <canvas id="trafficChart"></canvas>
+                    </div>
+                    <div class="bg-slate-800/50 border border-slate-700 p-4 rounded-2xl h-80 flex justify-center w-full">
+                        <canvas id="sectorChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
+                    <h3 class="text-white font-medium mb-4">Daily Executive Summary</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Today observed a <span class="text-green-400">+12%</span> increase in total tokens generated compared to yesterday. 
+                        The busiest location was <strong>City Hospital Main</strong> with 1,200 tokens. 
+                        Average wait time across all network nodes remains at healthy bounds (18 minutes). 
+                        No anomalous server downtimes recorded.
+                    </p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+
+    <!-- New Location Modal -->
+    <div id="locationModal" class="hidden fixed inset-0 z-50 flex justify-center items-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 w-full max-w-lg relative animate-fade-in-up">
+            <button onclick="closeModal('locationModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-white mb-6">Add New Location</h2>
+            <form id="locationForm" onsubmit="event.preventDefault(); submitLocation();" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Location Name (Branch)</label>
+                    <input type="text" id="newLocationName" class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="e.g. Apollo Downtown" required>
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Select Sector</label>
+                    <select id="newLocationSector" class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500" required>
+                        <option>Hospital</option>
+                        <option>Bank</option>
+                        <option>College</option>
+                        <option>Government</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3 justify-end">
+                    <button type="button" onclick="closeModal('locationModal')" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white transition">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg shadow-lg transition">Create Location</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Onboard Staff Modal -->
+    <div id="staffModal" class="hidden fixed inset-0 z-50 flex justify-center items-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 w-full max-w-lg relative animate-fade-in-up">
+            <button onclick="closeModal('staffModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-white mb-6">Onboard New Staff</h2>
+            <form id="staffForm" onsubmit="event.preventDefault(); submitStaff();" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Staff Full Name</label>
+                    <input type="text" id="newStaffName" class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="John Doe" required>
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Email Address</label>
+                    <input type="email" id="newStaffEmail" class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="staff@queue.com" required>
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Assign to Location (Optional)</label>
+                    <select id="newStaffLocation" data-locations-select class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3 justify-end">
+                    <button type="button" onclick="closeModal('staffModal')" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white transition">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg shadow-lg transition">Onboard Staff</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Counter Modal -->
+    <div id="counterModal" class="hidden fixed inset-0 z-50 flex justify-center items-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 w-full max-w-lg relative animate-fade-in-up">
+            <button onclick="closeModal('counterModal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 class="text-2xl font-bold text-white mb-6">Create New Counter</h2>
+            <form id="counterForm" onsubmit="event.preventDefault(); submitCounter();" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Counter Name</label>
+                    <input type="text" id="newCounterName" class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="e.g. OPD Desk 2" required>
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Select Location</label>
+                    <select id="newCounterLocation" data-locations-select class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500" required>
+                        <option>Loading...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-400 font-medium mb-1">Assigned Staff (Optional)</label>
+                    <select id="newCounterStaff" class="w-full bg-slate-900 border border-slate-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-indigo-500">
+                        <option value="">-- Leave Unassigned --</option>
+                        <option>Sarah Manager</option>
+                        <option>John Staff</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3 justify-end">
+                    <button type="button" onclick="closeModal('counterModal')" class="px-4 py-2 rounded-lg text-slate-300 hover:text-white transition">Cancel</button>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg shadow-lg transition">Create Counter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="logoutConfirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div class="mx-auto max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
+            <h2 class="text-xl font-semibold text-slate-900 mb-2">Confirm Logout</h2>
+            <p class="text-sm text-slate-600 mb-6">Are you sure you want to logout?</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="cancelLogout()" class="rounded-lg border border-slate-200 px-4 py-2 text-slate-700">No</button>
+                <button onclick="performLogout()" class="rounded-lg bg-red-600 px-4 py-2 text-white">Yes</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

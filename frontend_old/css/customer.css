@@ -1,0 +1,113 @@
+/* customer.css
+   Custom styles and responsive fixes for the customer dashboard. */
+
+:root {
+    font-size: 1rem;
+    font-size: clamp(14px, 1.2vw, 16px);
+    line-height: 1.6;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #1f2937;
+}
+
+main {
+    width: min(100%, 1200px);
+    margin: 0 auto;
+}
+
+.glass-header {
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.pulse-circle {
+    animation: pulse 2s infinite;
+}
+
+#active-token-card {
+    min-height: 260px;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    }
+}
+
+@media (max-width: 1024px) {
+    body {
+        font-size: 0.95rem;
+    }
+
+    main {
+        padding: 1.5rem 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    nav .flex {
+        flex-wrap: wrap;
+    }
+
+    .lg\:col-span-2,
+    .lg\:grid-cols-3 {
+        grid-column: auto !important;
+    }
+
+    .grid.md\:grid-cols-3 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .customer-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    #genTokenBtn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 0.95rem;
+    }
+
+    .glass-header {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .text-5xl {
+        font-size: clamp(2rem, 7vw, 2.5rem) !important;
+    }
+
+    #active-token-card {
+        padding: 2rem;
+    }
+}
+
+@media (min-width: 1440px) {
+    :root {
+        font-size: clamp(16px, 1.05vw, 18px);
+    }
+}

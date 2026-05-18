@@ -1,0 +1,99 @@
+package com.smartqueue.backend.controller;
+
+import com.smartqueue.backend.dto.ApiResponse;
+import com.smartqueue.backend.entity.*;
+import com.smartqueue.backend.repository.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
+public class AdminController {
+
+    private final LocationRepository locationRepository;
+    private final ServiceCounterRepository serviceCounterRepository;
+    private final QueueRepository queueRepository;
+    private final TokenRepository tokenRepository;
+    private final UserRepository userRepository;
+    private final StaffCounterAssignmentRepository staffCounterAssignmentRepository;
+
+    @GetMapping("/dashboard/metrics")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getDashboardMetrics() {
+        Map<String, Object> metrics = new HashMap<>();
+        
+        // Total locations
+        metrics.put("totalLocations", locationRepository.count());
+        
+        // Active counters
+        metrics.put("activeCounters", serviceCounterRepository.count());
+        
+        // Total tokens today
+        long tokensToday = tokenRepository.count(); // You can filter by date if needed
+        metrics.put("totalTokensToday", tokensToday);
+        
+        // Average wait time (from queues)
+        List<QueueEntity> queues = queueRepository.findAll();
+        double avgWaitTime = queues.isEmpty() ? 0 : queues.stream()
+            .mapToInt(QueueEntity::getCurrentAverageWaitTime)
+            .average()
+            .orElse(0);
+        metrics.put("avgWaitTime", Math.round(avgWaitTime));
+        
+        return ResponseEntity.ok(new ApiResponse<>(true, "Metrics fetched", metrics));
+    }
+
+    @GetMapping("/counters")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getCountersWithAssignments() {
+        List<ServiceCounter> counters = serviceCounterRepository.findAll();
+        List<Map<String, Object>> counterData = counters.stream().map(counter -> {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", counter.getId());
+            data.put("name", counter.getName());
+            data.put("location", counter.getLocation().getName());
+            data.put("service", counter.getService().getName());
+            
+            // Get assigned staff
+            List<StaffCounterAssignment> assignments = staffCounterAssignmentRepository.findByCounterId(counter.getId());
+            if (!assignments.isEmpty()) {
+                data.put("assignedStaff", assignments.get(0).getStaff().getUsername());
+            } else {
+                data.put("assignedStaff", "Unassigned");
+            }
+            
+            // Get queue status
+            List<QueueEntity> queues = queueRepository.findAllByCounterId(counter.getId());
+            data.put("status", queues.isEmpty() || queues.get(0).getStatus().equals("INACTIVE") ? "Offline" : "Serving");
+            
+            return data;
+        }).collect(Collectors.toList());
+        
+        return ResponseEntity.ok(new ApiResponse<>(true, "Counters fetched", counterData));
+    }
+
+    @PostMapping("/staff")
+    public ResponseEntity<ApiResponse<String>> createStaff(@RequestBody Map<String, Object> request) {
+        return ResponseEntity.ok(new ApiResponse<>(true, "Staff created", null));
+    }
+    
+    @GetMapping("/users")
+    public ResponseEntity<ApiResponse<List<User>>> getUsers() {
+        List<User> users = userRepository.findAll();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Users fetched", users));
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getReports() {
+        Map<String, Object> reports = new HashMap<>();
+        reports.put("totalUsers", userRepository.count());
+        reports.put("totalCounters", serviceCounterRepository.count());
+        reports.put("totalLocations", locationRepository.count());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Reports fetched", reports));
+    }
+}
