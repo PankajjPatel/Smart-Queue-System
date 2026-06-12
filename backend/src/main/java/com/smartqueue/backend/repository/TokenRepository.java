@@ -17,4 +17,13 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
     
     @Query("SELECT MAX(t.tokenNumber) FROM Token t WHERE t.queue.id = :queueId")
     Integer findMaxTokenNumberByQueueId(@Param("queueId") Integer queueId);
+
+    @Query("SELECT COUNT(t) FROM Token t WHERE FUNCTION('DATE', t.issueTime) = FUNCTION('CURRENT_DATE')")
+    long countTokensToday();
+
+    List<Token> findByUserIdAndStatusInOrderByIssueTimeDesc(Integer userId, List<String> statuses);
+
+    java.util.Optional<Token> findFirstByUserIdAndStatusInOrderByIssueTimeDesc(Integer userId, List<String> statuses);
+
+    long countByQueueIdAndStatus(Integer queueId, String status);
 }

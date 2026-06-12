@@ -24,4 +24,19 @@ public class TokenController {
         TokenResponseDto response = tokenService.generateToken(request, email);
         return ResponseEntity.ok(new ApiResponse<>(true, "Token generated successfully", response));
     }
+
+    @GetMapping("/active")
+    public ResponseEntity<ApiResponse<TokenResponseDto>> getActiveToken(
+            Authentication authentication) {
+        String email = authentication.getName();
+        TokenResponseDto response = tokenService.getActiveTokenForUser(email);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Active token retrieved successfully", response));
+    }
+
+    @GetMapping("/{tokenId}/status")
+    public ResponseEntity<ApiResponse<TokenResponseDto>> getTokenStatus(
+            @PathVariable Integer tokenId) {
+        TokenResponseDto response = tokenService.getTokenStatus(tokenId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Token status retrieved successfully", response));
+    }
 }

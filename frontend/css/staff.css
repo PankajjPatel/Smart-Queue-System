@@ -1,0 +1,84 @@
+/* staff.css
+   Responsive styles for the staff dashboard. */
+
+:root {
+    font-size: 1rem;
+    font-size: clamp(14px, 1.1vw, 16px);
+    line-height: 1.6;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+main {
+    width: min(100%, 1200px);
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+}
+
+#current-token {
+    font-size: clamp(3rem, 9vw, 5rem);
+}
+
+.action-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.history-panel {
+    max-height: 600px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 1rem 0.75rem;
+    }
+
+    .stats-grid,
+    .action-area {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+    }
+
+    .action-area {
+        align-items: stretch;
+    }
+
+    .history-panel {
+        max-height: none;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 0.95rem;
+    }
+
+    #current-token {
+        font-size: clamp(2.5rem, 12vw, 4rem);
+    }
+}

@@ -61,4 +61,85 @@ public class TokenService {
                 estWaitMins
         );
     }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public TokenResponseDto getActiveTokenForUser(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        java.util.List<String> activeStatuses = java.util.Arrays.asList("PENDING", "CALLED", "IN_PROGRESS");
+        Token token = tokenRepository.findFirstByUserIdAndStatusInOrderByIssueTimeDesc(user.getId(), activeStatuses)
+                .orElseThrow(() -> new ResourceNotFoundException("No active token found for this user"));
+
+        QueueEntity queue = token.getQueue();
+        ServiceCounter counter = queue.getCounter();
+
+        long personsAhead = tokenRepository.findByQueueIdAndStatusOrderByTokenNumberAsc(queue.getId(), "PENDING")
+                .stream()
+                .filter(t -> t.getId() < token.getId())
+                .count();
+        int estWaitMins = queue.getCurrentAverageWaitTime() * (int) personsAhead;
+
+        return new TokenResponseDto(
+                token.getId(),
+                token.getTokenNumber(),
+                token.getStatus(),
+                counter.getLocation().getName() + " - " + counter.getName(),
+                counter.getService().getName(),
+                token.getExpectedServiceTime(),
+                personsAhead,
+                estWaitMins
+        );
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public TokenResponseDto getTokenStatus(Integer tokenId) {
+        Token token = tokenRepository.findById(tokenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Token not found"));
+
+        QueueEntity queue = token.getQueue();
+        ServiceCounter counter = queue.getCounter();
+
+        long personsAhead = 0;
+        int estWaitMins = 0;
+
+        if ("PENDING".equals(token.getStatus())) {
+            personsAhead = tokenRepository.findByQueueIdAndStatusOrderByTokenNumberAsc(queue.getId(), "PENDING")
+                    .stream()
+                    .filter(t -> t.getId() < token.getId())
+                    .count();
+            estWaitMins = queue.getCurrentAverageWaitTime() * (int) personsAhead;
+        }
+
+        return new TokenResponseDto(
+                token.getId(),
+                token.getTokenNumber(),
+                token.getStatus(),
+                counter.getLocation().getName() + " - " + counter.getName(),
+                counter.getService().getName(),
+                token.getExpectedServiceTime(),
+                personsAhead,
+                estWaitMins
+        );
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public com.smartqueue.backend.dto.QueueInfoResponseDto getQueueInfo(Integer locationId, Integer serviceId) {
+        ServiceCounter counter = counterRepository.findByLocationId(locationId).stream()
+                .filter(c -> c.getService().getId().equals(serviceId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("No active counter serving this service at this location"));
+
+        QueueEntity queue = queueRepository.findByCounterId(counter.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Queue not active for this counter"));
+
+        long personsAhead = tokenRepository.countPendingTokensInQueue(queue.getId());
+        int estWaitMins = queue.getCurrentAverageWaitTime() * (int) personsAhead;
+
+        return new com.smartqueue.backend.dto.QueueInfoResponseDto(
+                personsAhead,
+                estWaitMins,
+                counter.getName()
+        );
+    }
 }
