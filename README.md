@@ -1,6 +1,12 @@
-# Smart Queue Management System 🎫
+# Smart Queue Management System (S4) 🚦
 
-> **Slogan:** Efficiency in Every Turn ⭐  
+[![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)](https://oracle.com/java)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2.5-green?style=for-the-badge&logo=springboot)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)](https://react.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-cyan?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=for-the-badge&logo=mysql)](https://mysql.com)
+
+> **Slogan:** Efficiency in Every Turn 🏫  
 > **Tagline:** Streamlining customer flows, optimizing counter service, and reducing wait times with real-time queue intelligence.
 
 A production-ready **Smart Queue Management System** designed to manage and optimize customer waiting lines. The project consists of a high-performance **Java Spring Boot backend** secured with JWT authentication, a relational **MySQL database** layer, and a modern **Vite-based frontend** supporting customer, staff, and admin portals.
@@ -18,83 +24,69 @@ A production-ready **Smart Queue Management System** designed to manage and opti
 
 ### Frontend (Vite & Vanilla JS)
 - **Bundler:** Vite (for fast module bundling and development)
-- **UI / UX Styling:** Modern responsive CSS with custom layouts
-- **Logic:** Vanilla JS with Fetch API for backend integration
-- **Portals:** Dedicated user flows for Customers, Staff, and Administrators
+- **Styling:** Custom responsive CSS layouts and CSS parameters
 
 ---
 
-## 📂 Project Architecture
+## 🚀 Setup & Execution Guide
 
-```
-smart-queue-system/
-├── backend/                  # Spring Boot Java Application
-│   ├── src/main/java/        # Java source code (Controllers, Services, Repositories, DTOs, Security)
-│   ├── src/main/resources/   # Application properties and SQL scripts (data.sql, schema.sql)
-│   └── pom.xml               # Maven dependency configuration
-├── database/                 # Relational database scripts
-│   ├── schema.sql            # Database tables and relationships setup
-│   └── data.sql              # Seed data for roles, services, and counters
-└── frontend/                 # React/Vite/HTML User Interfaces
-    ├── css/                  # Styling files
-    ├── js/                   # Core JavaScript files handling APIs
-    ├── index.html            # Customer Landing Page (Token Generation)
-    ├── customer.html         # Customer Queue Dashboard (Real-time View)
-    ├── staff.html            # Staff Counter Console
-    ├── admin.html            # Admin Configuration Panel
-    └── vite.config.js        # Vite configuration
-```
+### Prerequisites
+- Java Development Kit (JDK) 17+ installed
+- Node.js (v18+) installed
+- MySQL Server 8.0 running locally
 
----
-
-## 🔑 Role-Based Access Control (RBAC)
-
-The application implements secure role-based endpoints:
-1. **Customer:** Can view active queues and generate new queue tokens.
-2. **Staff:** Can manage active tokens at their assigned counter (calling next customer, marking complete, etc.).
-3. **Admin:** Can create/update locations, services, staff accounts, and counter assignments.
-
----
-
-## 🚀 Step-by-Step Local Setup Guide
-
-Follow these steps to run the Smart Queue Management System locally:
-
-### 1. Database Configuration
-1. Start your local MySQL service.
-2. Create a database named `smart_queue`:
+### 1. Database Setup
+1. Log into your MySQL console and create the database:
    ```sql
    CREATE DATABASE smart_queue;
    ```
-3. Import the database schema and default seed data using the SQL scripts in `database/schema.sql` and `database/data.sql`.
-
-### 2. Backend Setup
-1. Navigate to the `backend/` directory.
-2. Configure your MySQL credentials in `src/main/resources/application.properties`:
+2. Update the credentials in `backend/src/main/resources/application.properties` (or yml) to match your environment username and password:
    ```properties
    spring.datasource.url=jdbc:mysql://localhost:3306/smart_queue
    spring.datasource.username=root
-   spring.datasource.password=your_password
+   spring.datasource.password=Root@123
    ```
-3. Run the backend application using Maven:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-   The backend API server will start on `http://localhost:8080`.
 
-### 3. Frontend Setup
-1. Navigate to the `frontend/` directory.
-2. Install dependencies:
+### 2. Backend Installation (Spring Boot)
+1. Navigate to the `backend` directory containing `pom.xml`:
+   ```bash
+   cd backend
+   mvn clean install
+   ```
+2. Launch the backend application:
+   ```bash
+   mvn spring-boot:run
+   ```
+   The backend API will run on `http://localhost:8080/`. You can view API documentation at `http://localhost:8080/swagger-ui/index.html`.
+
+### 3. Frontend Installation (React + Vite)
+1. Open a new shell and navigate to the `frontend` folder:
+   ```bash
+   cd frontend
+   ```
+2. Install npm packages:
    ```bash
    npm install
    ```
-3. Start the Vite development server:
+3. Run the development server:
    ```bash
    npm run dev
    ```
-4. Open your browser and navigate to the local URL (usually `http://localhost:5173`).
+   Open your browser and navigate to `http://localhost:5173`.
 
 ---
 
-## 📝 License
-This project is proprietary and for educational purposes.
+## 📂 Project Structure
+```
+S4/
+├── backend/                   # Spring Boot core files
+│   ├── src/main/java          # Controllers, Services, Repositories, Configs
+│   └── pom.xml                # Backend dependencies (JPA, Security, JJWT)
+│
+├── frontend/                  # React dashboard frontend
+│   ├── src/                   # Components, Layouts, Hooks
+│   ├── package.json           # Node configuration scripts
+│   └── vite.config.js         # Vite compile configuration
+│
+└── README.md                  # Root project documentation
+```

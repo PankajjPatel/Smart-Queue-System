@@ -30,6 +30,7 @@
 		<java.version>24</java.version>
 	</properties>
 	<dependencies>
+            <!-- Spring Data JPA for Object-Relational Mapping with MySQL -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
