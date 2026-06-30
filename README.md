@@ -11,7 +11,7 @@
 
 A production-ready **Smart Queue Management System** designed to manage and optimize customer waiting lines. The project consists of a high-performance **Java Spring Boot backend** secured with JWT authentication, a relational **MySQL database** layer, and a modern **Vite-based frontend** supporting customer, staff, and admin portals.
 
----  
+---  hi
 
 ## 🛠️ Tech Stack & Key Libraries
 
